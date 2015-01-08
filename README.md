@@ -1,4 +1,5 @@
-# Kaggle Competitions
-This repository is for Kaggle competitions. Each competition is a eclipse project.
-* Digit Recoganizer
-* Titantic
+# Machine learning projects or Kaggle Competitions
+This repository is for Machine learning projects or Kaggle competitions.
+* Digit Recoganizer (Kaggle)
+* Titantic (Kaggel)
+* SVD (image compression experiment)
