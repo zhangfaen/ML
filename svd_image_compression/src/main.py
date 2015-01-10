@@ -40,7 +40,7 @@ if __name__ == '__main__':
     ms = cs(s, ia_r.shape)
     print "s"
     print s
-    left = 50
+    left = 20
     # new_ia_r = u * ms * v
     new_ia_r = u[:, 0:left] * ms[0:left, 0:left] * v[0:left, :]
     new_ia_r = np.array(new_ia_r).astype(np.uint8)
