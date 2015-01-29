@@ -30,8 +30,7 @@ public class Main {
     }
 
     private static void readCsv(int m_train, int m_test) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(
-                "/Users/zhangfaen/dev/ml/kaggle/neural_network/data/train.csv"));
+        BufferedReader br = new BufferedReader(new FileReader("data/train.csv"));
         int total = 0;
         // one instance is 28*28 picture.
         instances = new double[m_train][28 * 28];
@@ -80,7 +79,6 @@ public class Main {
     private static int[] targets = null;
     private static double[][] test_instances = null;
     private static int[] test_targets = null;
-
 
     public static void main(String[] args) throws Exception {
         readCsv(3000, 500);
