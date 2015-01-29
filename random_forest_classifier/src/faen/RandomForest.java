@@ -25,7 +25,7 @@ public class RandomForest {
     private int numOfFeatures_;
     private int maxDepth_;
     private TreeNode[] trees_;
-    private static Random rand = new Random(3);
+    private static Random rand = new Random();
 
     /**
      * Train the RF model
@@ -157,6 +157,9 @@ public class RandomForest {
             });
             int bestIndex = -1;
             for (int i = 0; i < indices.size() - 1; i++) {
+                if (instances_[indices.get(i)][featureIndex] == instances_[indices.get(i + 1)][featureIndex]) {
+                    continue;
+                }
                 double entropy = 1.0 * (i + 1 - 0) / indices.size() * getEntropy(indices, 0, i + 1)
                         + 1.0 * (indices.size() - (i + 1)) / indices.size()
                         * getEntropy(indices, i + 1, indices.size());
@@ -174,8 +177,13 @@ public class RandomForest {
                 rightIndices.addAll(indices.subList(bestIndex + 1, indices.size()));
             }
         }
-        return new TreeNode(bestFeatureIndex, splitValue, -1, buildTree(leftIndices, curDepth + 1),
-                buildTree(rightIndices, curDepth + 1), false);
+        if (bestFeatureIndex >= 0) {
+            return new TreeNode(bestFeatureIndex, splitValue, -1, buildTree(leftIndices,
+                    curDepth + 1), buildTree(rightIndices, curDepth + 1), false);
+        } else {
+            // All instances have the same features.
+            return new TreeNode(-1, -1, getMajorClass(indices), null, null, true);
+        }
     }
 
     private int predicateByOneTree(TreeNode node, double[] instance) {
