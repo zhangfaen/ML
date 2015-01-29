@@ -83,9 +83,9 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        readCsv(3000, 200);
+        readCsv(3000, 500);
         RandomForest rf = new RandomForest();
-        rf.train(instances, targets, 20, 28, -1);
+        rf.train(instances, targets, 20, 28, -1, 1000);
         int correct = 0;
         int wrong = 0;
         for (int i = 0; i < test_targets.length; i++) {

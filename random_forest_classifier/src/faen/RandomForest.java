@@ -25,6 +25,7 @@ public class RandomForest {
     private int numOfFeatures_;
     private int maxDepth_;
     private TreeNode[] trees_;
+    private static Random rand = new Random(3);
 
     /**
      * Train the RF model
@@ -40,7 +41,7 @@ public class RandomForest {
      *            instance.
      */
     public void train(double[][] instances, int[] targets, int numOfTrees, int numOfFeatures,
-            int maxDepth) {
+            int maxDepth, int treeSize) {
         Util.CHECK(instances.length == targets.length, "");
         Util.CHECK(numOfTrees > 0, "");
         this.instances_ = instances;
@@ -51,14 +52,13 @@ public class RandomForest {
         this.trees_ = new TreeNode[numOfTrees_];
         for (int i = 0; i < trees_.length; i++) {
             System.out.println("building the tree:" + i);
-            trees_[i] = buildTree(getRandomInstances(400), 1);
+            trees_[i] = buildTree(getRandomInstances(treeSize), 1);
         }
     }
 
     // Get sub set of all instances randomly.
     List<Integer> getRandomInstances(int numOfInstances) {
         List<Integer> ret = new ArrayList<Integer>(numOfInstances);
-        Random rand = new Random();
         while (ret.size() < numOfInstances) {
             ret.add(rand.nextInt(instances_.length));
         }
@@ -96,7 +96,7 @@ public class RandomForest {
 
     // Get a list of indices of features randomly.
     private List<Integer> getRandomFeatures() {
-        Random rand = new Random();
+
         Set<Integer> set = new HashSet<Integer>();
         int featureSize = instances_[0].length;
         while (set.size() < numOfFeatures_) {
@@ -110,13 +110,14 @@ public class RandomForest {
 
     // Get the entropy of some samples.
     private double getEntropy(List<Integer> indices, int from, int to) {
+        Util.CHECK(to <= indices.size(), "");
         Map<Integer, Integer> mii = new HashMap<Integer, Integer>();
         for (int i = from; i < to; i++) {
-            Integer v = mii.get(indices.get(i));
+            Integer v = mii.get(targets_[indices.get(i)]);
             if (v == null) {
                 v = 0;
             }
-            mii.put(indices.get(i), v + 1);
+            mii.put(targets_[indices.get(i)], v + 1);
         }
         double ret = 0;
         for (Integer key : mii.keySet()) {
@@ -148,12 +149,13 @@ public class RandomForest {
                     if (instances_[o1][featureIndex] < instances_[o2][featureIndex]) {
                         return -1;
                     } else if (instances_[o1][featureIndex] == instances_[o2][featureIndex]) {
-                        return 0;
+                        return o1 - o2;
                     } else {
                         return 1;
                     }
                 }
             });
+            int bestIndex = -1;
             for (int i = 0; i < indices.size() - 1; i++) {
                 double entropy = 1.0 * (i + 1 - 0) / indices.size() * getEntropy(indices, 0, i + 1)
                         + 1.0 * (indices.size() - (i + 1)) / indices.size()
@@ -161,15 +163,18 @@ public class RandomForest {
                 if (entropy < bestEntropy) {
                     bestEntropy = entropy;
                     bestFeatureIndex = featureIndex;
-                    leftIndices = new ArrayList<Integer>();
-                    rightIndices = new ArrayList<Integer>();
-                    leftIndices.addAll(indices.subList(0, i + 1));
-                    rightIndices.addAll(indices.subList(i + 1, indices.size()));
+                    bestIndex = i;
                     splitValue = instances_[indices.get(i)][featureIndex];
                 }
             }
+            if (bestIndex >= 0) {
+                leftIndices = new ArrayList<Integer>();
+                rightIndices = new ArrayList<Integer>();
+                leftIndices.addAll(indices.subList(0, bestIndex + 1));
+                rightIndices.addAll(indices.subList(bestIndex + 1, indices.size()));
+            }
         }
-        return new TreeNode(bestFeatureIndex, splitValue, 1, buildTree(leftIndices, curDepth + 1),
+        return new TreeNode(bestFeatureIndex, splitValue, -1, buildTree(leftIndices, curDepth + 1),
                 buildTree(rightIndices, curDepth + 1), false);
     }
 
@@ -224,7 +229,23 @@ public class RandomForest {
         }
     }
 
-    public static void main(String[] args) {
+    public static void printTree(TreeNode node, String indedent) {
+        if (node.isLeafNode_) {
+            System.out.println(indedent + "target:" + node.target_);
+        } else {
+            System.out.println(indedent + "feature index:" + node.featureIndex_ + ", split value:"
+                    + node.value_);
+            printTree(node.left_, indedent + "    ");
+            printTree(node.right_, indedent + "    ");
+        }
+    }
 
+    public static void main(String[] args) {
+        //
+        double[][] instances = new double[][] { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
+        int[] targets = new int[] { 1, 2, 3, 4 };
+        RandomForest rf = new RandomForest();
+        rf.train(instances, targets, 1, 2, -1, 10);
+        printTree(rf.trees_[0], "");
     }
 }
