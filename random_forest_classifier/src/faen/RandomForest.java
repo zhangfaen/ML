@@ -249,7 +249,6 @@ public class RandomForest {
     }
 
     public static void main(String[] args) {
-        //
         double[][] instances = new double[][] { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
         int[] targets = new int[] { 1, 2, 3, 4 };
         RandomForest rf = new RandomForest();

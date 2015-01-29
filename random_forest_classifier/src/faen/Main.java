@@ -8,7 +8,6 @@ public class Main {
     private static int BLACK_WHITE_THRESHOLD = 100;
 
     private static void printImage(int[][] pic) {
-        // System.out.println("total:" + total);
         for (int i = 0; i < pic.length; i++) {
             for (int j = 0; j < pic[0].length; j++) {
                 if (pic[i][j] > 0) {
