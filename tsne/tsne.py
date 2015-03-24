@@ -110,7 +110,7 @@ def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0):
 	max_iter = 1000;
 	initial_momentum = 0.5;
 	final_momentum = 0.8;
-	eta = 500;
+	eta = 200;
 	min_gain = 0.01;
 	Y = Math.random.randn(n, no_dims);
 	dY = Math.zeros((n, no_dims));
