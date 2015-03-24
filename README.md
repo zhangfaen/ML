@@ -8,4 +8,4 @@ This repository is for Machine learning projects or Kaggle competitions.
 * (t-SNE) is a technique for dimensionality reduction that is particularly well suited for the visualization of high-dimensional datasets. 
  
 
-t-SNE ![alt tag](https://github.com/zhangfaen/ML/blob/master/tsne/mnist_tsne.jpg)
+t-SNE ![alt tag](https://github.com/zhangfaen/ML/blob/master/tsne/mnist_tsne_small.jpg)
