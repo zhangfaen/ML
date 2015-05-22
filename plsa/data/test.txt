@@ -1,0 +1,10 @@
+99
+A B A C
+C B
+A C C
+A B C
+D E
+E D F
+E F F
+F F F
+F A

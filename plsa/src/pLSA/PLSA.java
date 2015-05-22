@@ -101,11 +101,11 @@ public class PLSA {
     static double[][] phi;
     static int words = 0;
     static int docs = 0;
-    static int topics = 50;
-    static int iterations = 200;
+    static int topics = 2;
+    static int iterations = 30;
 
     public static void main(String[] args) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File("data/weibo-small-data.txt"));
+        Scanner scanner = new Scanner(new File("data/test.txt"));
         // The first line is useless.
         scanner.nextLine();
         while (scanner.hasNextLine()) {
@@ -207,7 +207,10 @@ public class PLSA {
             sort(topicWords);
 
             for (int word = 0; word < Math.min(20, topicWords.size()); word++) {
-                System.out.print(wordIdToWord.get(topicWords.get(word).i) + ",");
+                if (topicWords.get(word).d > 0.00000000001) {
+                    System.out.print(wordIdToWord.get(topicWords.get(word).i) + " "
+                            + String.format("%.3f", topicWords.get(word).d) + ",");
+                }
             }
             System.out.println();
         }
