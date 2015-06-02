@@ -1,3 +1,4 @@
+package oneImplementationOfBaumWelch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -273,7 +274,7 @@ public class HmmBaumWelch {
             System.out.println("iteration " + iter + ", delta_pi=" + delta_pi + ", delta_a="
                     + delta_a + ", delta_b=" + delta_b + ", logLikelihood:" + logLikelihood);
             if (delta_pi <= DELTA_PI && delta_a <= DELTA_A && delta_b <= DELTA_B) {
-                break;
+                // break;
             } else {
                 stateProb = stateProb_new;
                 stateTrans = stateTrans_new;

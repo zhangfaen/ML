@@ -1,3 +1,4 @@
+package oneImplementationOfBaumWelch;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,9 +28,9 @@ public class Main {
         int samples = 1000;
         for (int i = 0; i < samples; i++) {
             int diceIndex = chooseOneRandomly(stateProb);
-            for (int j = 0; j < 200; j++) {
+            for (int j = 0; j < 6; j++) {
                 int output = chooseOneRandomly(emission[diceIndex]);
-                bw.write("" + output + ",");
+                bw.write("" + output + "");
                 diceIndex = chooseOneRandomly(stateTrans[diceIndex]);
             }
             bw.write("\n");
@@ -44,7 +45,7 @@ public class Main {
         // { 0.1, 0.9 } }, new double[][] { { 0.4, 0.6 }, { 0.5, 0.5 } });
 
         hbw.print();
-        hbw.baumWelch(5000);
+        hbw.baumWelch(50000);
         hbw.print();
         hbw.setSpecificInitalState(stateProb, stateTrans, emission);
         hbw.baumWelch(1);
