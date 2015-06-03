@@ -25,7 +25,7 @@ public class Main {
     }
 
     static void test() throws IOException {
-        double[] stateProb = { 0.5, 0.5 };
+        double[] stateProb = { 0.99, 0.01 };
         String[] state = { "A", "B" };
         double[][] aprob = { { 0.1, 0.9 }, { 0.2, 0.8 } };
         String esym = "01";
@@ -51,13 +51,14 @@ public class Main {
     }
 
     static void dice() {
+        double [] pi = {0.5, 0.5};
         String[] state = { "F", "L" };
         double[][] aprob = { { 0.95, 0.05 }, { 0.10, 0.90 } };
         String esym = "123456";
         double[][] eprob = { { 1.0 / 6, 1.0 / 6, 1.0 / 6, 1.0 / 6, 1.0 / 6, 1.0 / 6 },
                 { 0.10, 0.10, 0.10, 0.10, 0.10, 0.50 } };
 
-        HMM hmm = new HMM(state, aprob, esym, eprob);
+        HMM hmm = new HMM(state, aprob, pi, esym, eprob);
 
         String x = "315116246446644245311321631164152133625144543631656626566666"
                 + "651166453132651245636664631636663162326455236266666625151631"
@@ -82,6 +83,7 @@ public class Main {
     }
 
     static void CpG() {
+        double [] pi = {1.0/4, 1.0/4, 1.0/4, 1.0/4};
         String[] state = { "A+", "C+", "G+", "T+", "A-", "C-", "G-", "T-" };
         double p2m = 0.05; // P(switch from plus to minus)
         double m2p = 0.01; // P(switch from minus to plus)
@@ -99,7 +101,7 @@ public class Main {
         double[][] eprob = { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 },
                 { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
 
-        HMM hmm = new HMM(state, aprob, esym, eprob);
+        HMM hmm = new HMM(state, aprob, pi, esym, eprob);
 
         String x = "CGCG";
         Viterbi vit = new Viterbi(hmm, x);

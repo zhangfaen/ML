@@ -1,4 +1,5 @@
 package yetAnotherImplementationOfBaumWelch;
+
 // Reference: 
 //   http://www.itu.dk/people/sestoft/bsa.html
 //   http://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
@@ -32,7 +33,7 @@ class HMM {
     // esym = string of emission names
     // emat = matrix of emission probabilities
 
-    public HMM(String[] state, double[][] amat, String esym, double[][] emat) {
+    public HMM(String[] state, double[][] amat, double[] pi, String esym, double[][] emat) {
         if (state.length != amat.length)
             throw new IllegalArgumentException("HMM: state and amat disagree");
         if (amat.length != emat.length)
@@ -53,8 +54,12 @@ class HMM {
         loga[0][0] = Double.NEGATIVE_INFINITY; // = log(0)
         // P(start -> other) = 1.0/state.length
         double fromstart = Math.log(1.0 / state.length);
-        for (int j = 1; j < nstate; j++)
+        for (int j = 1; j < nstate; j++) {
             loga[0][j] = fromstart;
+            if (pi != null) {
+                loga[0][j] = Math.log(pi[j - 1]);
+            }
+        }
         for (int i = 1; i < nstate; i++) {
             // Reverse state names for efficient backwards concatenation
             this.state[i] = new StringBuffer(state[i - 1]).reverse().toString();
@@ -80,8 +85,17 @@ class HMM {
     }
 
     public void print(SystemOut out) {
+        printpi(out);
         printa(out);
         printe(out);
+    }
+
+    public void printpi(SystemOut out) {
+        out.println("Start probabilities:");
+        for (int i = 1; i < nstate; i++) {
+            out.print(fmtlog(loga[0][i]));
+        }
+        out.println();
     }
 
     public void printa(SystemOut out) {
@@ -114,6 +128,16 @@ class HMM {
             return fmt.format(Math.exp(x));
     }
 
+    static void normalize(double[] all) {
+        double sum = 0;
+        for (double d : all) {
+            sum += d;
+        }
+        for (int i = 0; i < all.length; i++) {
+            all[i] /= sum;
+        }
+    }
+
     // The Baum-Welch algorithm for estimating HMM parameters for a
     // given model topology and a family of observed sequences.
     // Often gets stuck at a non-global minimum; depends on initial guess.
@@ -132,6 +156,7 @@ class HMM {
 
         double[][] amat = new double[nstate][];
         double[][] emat = new double[nstate][];
+        double[] pi = new double[nstate];
 
         // Set up the inverse of b -> esym.charAt(b); assume all esyms <= 'Z'
         int[] esyminv = new int[91];
@@ -145,8 +170,9 @@ class HMM {
             amat[k] = randomdiscrete(nstate);
             emat[k] = randomdiscrete(nesym);
         }
+        pi = randomdiscrete(nstate);
 
-        HMM hmm = new HMM(state, amat, esym, emat);
+        HMM hmm = new HMM(state, amat, pi, esym, emat);
 
         double oldloglikelihood;
 
@@ -159,6 +185,7 @@ class HMM {
             // Compute estimates for A and E
             double[][] A = new double[nstate][nstate];
             double[][] E = new double[nstate][nesym];
+            double[] PI = new double[nstate];
             for (int s = 0; s < nseqs; s++) {
                 String x = xs[s];
                 Forward fwd = fwds[s];
@@ -176,8 +203,16 @@ class HMM {
                             A[k][ell] += exp(fwd.f[i + 1][k + 1] + hmm.loga[k + 1][ell + 1]
                                     + hmm.loge[ell + 1][x.charAt(i + 1)] + bwd.b[i + 2][ell + 1]
                                     - P);
+                double pisum = 0;
+                for (int k = 0; k < nstate; k++) {
+                    pisum += exp(fwd.f[1][k + 1] + bwd.b[1][k + 1]);
+                }
+                for (int k = 0; k < nstate; k++) {
+                    PI[k] += exp(fwd.f[1][k + 1] + bwd.b[1][k + 1]) / pisum;
+                }
             }
             // Estimate new model parameters
+            normalize(PI);
             for (int k = 0; k < nstate; k++) {
                 double Aksum = 0;
                 for (int ell = 0; ell < nstate; ell++)
@@ -189,9 +224,10 @@ class HMM {
                     Eksum += E[k][b];
                 for (int b = 0; b < nesym; b++)
                     emat[k][b] = E[k][b] / Eksum;
+                pi[k] = PI[k];
             }
             // Create new model
-            hmm = new HMM(state, amat, esym, emat);
+            hmm = new HMM(state, amat, pi, esym, emat);
             loglikelihood = fwdbwd(hmm, xs, fwds, bwds, logP);
             System.out.println("log likelihood = " + loglikelihood);
             // hmm.print(new SystemOut());
